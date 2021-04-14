@@ -24,18 +24,36 @@ def insert_energy_type():
 
 # @Api.route('/getAll')
 # def get_user_info():
-#
 
-# @Api.route('/user/add')
-# def add_user():
-#     employee_id = request.args.get('employee_id')
-#     name = request.args.get('name')
-#     gender = request.args.get('gender')
-#     phone = request.args.get('phone')
-#     department = request.args.get('department')
+
+@Api.route('/user/add', methods=['POST'])
+def add_user():
+    try:
+        employee_id = request.args.get('employee_id')
+        name = request.args.get('name')
+        gender = request.args.get('gender')
+        phone = request.args.get('phone')
+        department_name = request.args.get('department_name')
+        if employee_id is None or gender is None or department_name is None:
+            return jsonify(code=20011, msg='参数为空',
+                           data={'employee_id': employee_id, 'name': name,
+                                 "gender": gender, "phone": phone, "department_name": department_name})
+        department = Department.query.filter_by(department_name=department_name).first()
+
+        user_info_record = UserInfoRecord(employee_id=employee_id, name=name, gender=gender,
+                                          phone=phone, department_id= department.id)
+        db.session.add(user_info_record)
+        db.session.commit()
+        return jsonify(code=10010, msg='用户信息添加成功', data={'employee_id': employee_id, 'name': name,
+                                 'gender': gender, 'phone': phone, 'department_name': department_name})
+
+    except Exception as e:
+        return jsonify(code=20010, msg="添加失败", data={str(e)})
+
 
 
 @Api.route('department/add', methods=['POST'])
+
 def add_department():
     try:
         department_name = request.args.get('department_name')
