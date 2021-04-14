@@ -40,6 +40,11 @@ def add_user():
                                  "gender": gender, "phone": phone, "department_name": department_name})
         department = Department.query.filter_by(department_name=department_name).first()
 
+        if department is None:
+            return jsonify(code=20012, msg="部门不存在", data={'employee_id': employee_id, 'name': name,
+                                                          'gender': gender, 'phone': phone,
+                                                          'department_name': department_name})
+
         user_info_record = UserInfoRecord(employee_id=employee_id, name=name, gender=gender,
                                           phone=phone, department_id= department.id)
         db.session.add(user_info_record)
