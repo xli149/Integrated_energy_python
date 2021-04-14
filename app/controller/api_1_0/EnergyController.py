@@ -2,7 +2,7 @@ import time
 
 from app.controller.api_1_0 import Api
 from flask import request, jsonify
-from app.model.Model import EnergyType, EnergyRecord
+from app.model.Model import EnergyType, EnergyRecord, UserInfoRecord,Department
 from utils.FakeData import fake_data
 from app import db
 
@@ -22,6 +22,37 @@ def insert_energy_type():
         return jsonify(code=20010, msg='添加失败', data=str(e))
 
 
+# @Api.route('/getAll')
+# def get_user_info():
+#
+
+# @Api.route('/user/add')
+# def add_user():
+#     employee_id = request.args.get('employee_id')
+#     name = request.args.get('name')
+#     gender = request.args.get('gender')
+#     phone = request.args.get('phone')
+#     department = request.args.get('department')
+
+
+@Api.route('department/add', methods=['POST'])
+def add_department():
+    try:
+        department_name = request.args.get('department_name')
+        print(f"department: {department_name}")
+        if department_name is None:
+            return jsonify(code=20011, msg='参数为空', data={'department_name': department_name})
+        new_department_name = Department(department_name=department_name)
+        db.session.add(new_department_name)
+        db.session.commit()
+        return jsonify(code=10010, msg='添加成功', data={'department_name': department_name})
+    except Exception as e:
+        return jsonify(code=20010, msg='添加失败', data={str(e)})
+
+
+
+
+
 @Api.route('/create/data')
 def create_data():
     while True:
@@ -35,11 +66,12 @@ def create_data():
         time.sleep(1)
 
 
+
+
 @Api.route('/')
 def index():
     data = EnergyRecord.query.order_by(db.desc(EnergyRecord.id)).first()
     data = {
         'rec_time':data.rec_time,
-        ''
     }
     return jsonify(data=data, code=200, msg='请求成功')
