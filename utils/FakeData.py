@@ -20,8 +20,8 @@ def fake_data() -> dict:
 				emp_concentrator_id=one_concentrator.cont_id).all()
 			for one_monitor_point in total_monitor_point:
 				data = {
-					'concentrator': one_concentrator.cont_name,
-					'monitor_point': one_monitor_point.emp_name,
+					'concentrator': one_concentrator.cont_id,
+					'monitor_point': one_monitor_point.emp_id,
 					'energy_voltage_a': random.uniform(200, 250),
 					'energy_voltage_b': random.uniform(200, 250),
 					'energy_tap': random.choice([i for i in range(50, 80)]),
