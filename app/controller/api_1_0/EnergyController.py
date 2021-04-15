@@ -7,6 +7,7 @@ from utils.FakeData import fake_data
 from app import db
 
 
+<<<<<<< HEAD
 @Api.route('/insert/energy/type', methods=['GET'])
 def insert_energy_type():
     try:
@@ -22,6 +23,8 @@ def insert_energy_type():
         return jsonify(code=20010, msg='添加失败', data=str(e))
 
 
+=======
+>>>>>>> cecf2959d674fa197fe9ac69c5a85c1bf4ed0da3
 @Api.route('/user/profile', methods=['POST'])
 def get_profile():
     try:
@@ -34,8 +37,11 @@ def get_profile():
         return jsonify(code=20010, msg='查询失败', data=str(e))
 
 
+<<<<<<< HEAD
 # @Api.route('/getAll')
 # def get_user_info():
+=======
+>>>>>>> cecf2959d674fa197fe9ac69c5a85c1bf4ed0da3
 
 
 @Api.route('/user/public_profiles', methods=['GET'])
@@ -92,7 +98,13 @@ def add_user():
         return jsonify(code=20010, msg="添加失败", data={str(e)})
 
 
+<<<<<<< HEAD
 @Api.route('department/add', methods=['POST'])
+=======
+
+@Api.route('/department/add', methods=['POST'])
+
+>>>>>>> cecf2959d674fa197fe9ac69c5a85c1bf4ed0da3
 def add_department():
     try:
         department_name = request.args.get('department_name')
@@ -109,6 +121,7 @@ def add_department():
 
 
 
+<<<<<<< HEAD
 @Api.route('/')
 def index():
     data = EnergyRecord.query.order_by(db.desc(EnergyRecord.id)).first()
@@ -116,3 +129,11 @@ def index():
         'rec_time': data.rec_time,
     }
     return jsonify(data=data, code=200, msg='请求成功')
+=======
+
+
+
+
+
+
+>>>>>>> cecf2959d674fa197fe9ac69c5a85c1bf4ed0da3
