@@ -2,8 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_cors import CORS
-
+from flask_migrate import Migrate
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 # 创建工厂函数，：将app所有配置，配置到app上，然后初始化app
@@ -17,8 +18,9 @@ def create_app():
     # 此回调可用于初始化应用程序以用于此数据库设置
     db.init_app(app)
 
+    migrate.init_app(app, db)
     # 将创建的蓝本绑定注册到应用实例app上
     from app.controller.api_1_0 import Api
     # 蓝图注册
-    app.register_blueprint(Api, url_prefix='/api/v0.1')
+    app.register_blueprint(Api)
     return app
