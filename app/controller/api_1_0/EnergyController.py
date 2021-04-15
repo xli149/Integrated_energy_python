@@ -2,7 +2,7 @@ import time
 
 from app.controller.api_1_0 import Api
 from flask import request, jsonify
-from app.model.Model import EnergyType, EnergyRecord, UserInfoRecord,Department
+from app.model.Model import EnergyType, EnergyRecord, UserInfoRecord, Department
 from utils.FakeData import fake_data
 from app import db
 
@@ -22,18 +22,16 @@ def insert_energy_type():
         return jsonify(code=20010, msg='添加失败', data=str(e))
 
 
-
 @Api.route('/user/profile', methods=['POST'])
 def get_profile():
     try:
         query_name = request.args.get('name')
         if query_name is None:
             return jsonify(code=20011, msg='参数为空', data={'user_profile': None})
-        user_profile = UserInfoRecord.filter_by('name'==query_name).first_or_404()
-        return jsonify(code=10010, msg='查询成功', data={'user_profile':user_profile})
+        user_profile = UserInfoRecord.filter_by('name' == query_name).first_or_404()
+        return jsonify(code=10010, msg='查询成功', data={'user_profile': user_profile})
     except Exception as e:
         return jsonify(code=20010, msg='查询失败', data=str(e))
-
 
 
 # @Api.route('/getAll')
@@ -58,10 +56,9 @@ def get_public_profiles():
                  }
             )
 
-        return jsonify(code=10010, msg='查询成功', data={'user_public_profiles':usr_list})
+        return jsonify(code=10010, msg='查询成功', data={'user_public_profiles': usr_list})
     except Exception as e:
         return jsonify(code=20010, msg='查询失败', data=str(e))
-
 
 
 @Api.route('/user/add', methods=['POST'])
@@ -84,19 +81,18 @@ def add_user():
                                                           'department_name': department_name})
 
         user_info_record = UserInfoRecord(employee_id=employee_id, name=name, gender=gender,
-                                          phone=phone, department_id= department.id)
+                                          phone=phone, department_id=department.id)
         db.session.add(user_info_record)
         db.session.commit()
         return jsonify(code=10010, msg='用户信息添加成功', data={'employee_id': employee_id, 'name': name,
-                                 'gender': gender, 'phone': phone, 'department_name': department_name})
+                                                         'gender': gender, 'phone': phone,
+                                                         'department_name': department_name})
 
     except Exception as e:
         return jsonify(code=20010, msg="添加失败", data={str(e)})
 
 
-
 @Api.route('department/add', methods=['POST'])
-
 def add_department():
     try:
         department_name = request.args.get('department_name')
@@ -113,26 +109,10 @@ def add_department():
 
 
 
-
-@Api.route('/create/data')
-def create_data():
-    while True:
-        data = fake_data()
-        new_energy = EnergyRecord(
-            rec_time=data['rec_time'],
-            electricity_consumption=data['electricity_consumption'],
-            electricity_way=data['electricity_way']['data'])
-        db.session.add(new_energy)
-        db.session.commit()
-        time.sleep(1)
-
-
-
-
 @Api.route('/')
 def index():
     data = EnergyRecord.query.order_by(db.desc(EnergyRecord.id)).first()
     data = {
-        'rec_time':data.rec_time,
+        'rec_time': data.rec_time,
     }
     return jsonify(data=data, code=200, msg='请求成功')
