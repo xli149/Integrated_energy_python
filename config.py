@@ -8,5 +8,7 @@ basedir = os.path.abspath(os.path.dirname(__name__))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'this is hard secret_key'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(seconds=1)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'test.db')
 

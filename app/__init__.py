@@ -18,7 +18,7 @@ def create_app():
     app.config.from_object(Config)
     # 此回调可用于初始化应用程序以用于此数据库设置
     db.init_app(app)
-    migrate.init_app(app,db)
+    migrate.init_app(app, db)
     # 将创建的蓝本绑定注册到应用实例app上
     from app.controller.api_1_0 import Api
     # 蓝图注册

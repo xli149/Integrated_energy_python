@@ -39,3 +39,4 @@ def fake_data() -> dict:
 
 if __name__ == '__main__':
 	print(fake_data())
+
