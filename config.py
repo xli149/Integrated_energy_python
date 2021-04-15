@@ -1,0 +1,12 @@
+import os
+from datetime import timedelta
+
+basedir = os.path.abspath(os.path.dirname(__name__))
+
+
+# 创建应用app的基础配置类
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'this is hard secret_key'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'test.db')
+
