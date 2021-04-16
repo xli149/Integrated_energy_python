@@ -1,4 +1,6 @@
 from app import db
+from app.controller.permission import Permission
+from app.controller.permission.Permission import Permissions
 
 
 class UserInfoRecord(db.Model):
@@ -11,32 +13,78 @@ class UserInfoRecord(db.Model):
     所属部门id
     """
     __tablename__ = 'UserInfo'
-    id = db.Column(db.Integer, primary_key=True)
-
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    account = db.Column(db.String(64), nullable=False)
+    pwd = db.Column(db.String(64), nullable=False)
     employee_id = db.Column(db.String(64))  # 主键
     name = db.Column(db.String(64), nullable=False)  # 姓名不能为空
     gender = db.Column(db.Enum("男", "女"), nullable=False)  # 性别 枚举 不能为空
     phone = db.Column(db.String(11))  # 手机号可以为空
     department_id = db.Column(db.Integer, nullable=False)
-#
-# class UserAccountRecord(db.Model):
-#     """
-#     id
-#     职工id
-#     用户名
-#     密码
-#     """
-#     __tablename__ = 'UserAccount'
-#     id = db.Column()
-#
+
+
+
 class Department(db.Model):
     """
     id
     部门名称
     """
     __tablename__ = 'Department'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     department_name = db.Column(db.String(64), nullable=False)
+
+# class Permissions:
+#     """
+#     权限类
+#     """
+#     USER_MANAGE = 0X01
+#     UPDATE_PERMISSION = 0x02
+
+class Role(db.Model):
+    """
+    id
+    角色名
+    权限总值
+    """
+    __tablename__ = 'Role'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(128), unique=True)
+    permission = db.Column(db.Integer)
+
+    @staticmethod
+    def init_role():
+        role_name_list = ['user', 'admin']
+        roles_permission_map = {
+            'user': [Permissions.USER_MANAGE],
+            'admin': [Permissions.USER_MANAGE, Permissions.UPDATE_PERMISSION]
+        }
+        try:
+            for role_name in role_name_list:
+                role = Role.query.filter_by(name=role_name).first()
+                if not role:
+                    role = Role(name=role_name)
+                role.reset_permissions()
+                print(f"role: {role}")
+                for permission in roles_permission_map[role_name]:
+                    print(f"permission: {permission}")
+                    role.permission = role.add_permission(permission)
+                db.session.add(role)
+            db.session.commit()
+        except Exception as e:
+            print(f"err message: {e}")
+            db.session.rollback()
+        db.session.close()
+
+    def reset_permissions(self):
+        self.permissions = 0
+
+    def has_permission(self, permission):
+        return self.permissions & permission == permission
+
+    def add_permission(self, permission):
+        if not self.has_permission(permission):
+            self.permissions += permission
+        return self.permissions
 
 
 # 能源消耗记录

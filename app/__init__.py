@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
+from app.model.Model import Role
 
 
 # 创建工厂函数，：将app所有配置，配置到app上，然后初始化app
