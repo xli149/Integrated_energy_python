@@ -9,6 +9,24 @@ from app import db
 
 
 
+def convert_profile_into_json_format(user_profile):
+    try:
+        if user_profile is None:
+            return None
+        department = Department.query.get(user_profile.department_id)
+        department_name = department.department_name
+        user_profile_format = {
+            'name': user_profile.name,
+            'employee_id': user_profile.employee_id,
+            'gender': user_profile.gender,
+            'phone': user_profile.phone,
+            'department': department_name
+        }
+        return user_profile_format
+
+    except Exception as e:
+        print(f"err: {e}")
+
 
 @Api.route('/user/profile', methods=['POST'])
 def get_profile():
@@ -16,7 +34,9 @@ def get_profile():
         query_name = request.args.get('name')
         if query_name is None:
             return jsonify(code=20011, msg='参数为空', data={'user_profile': None})
-        user_profile = UserInfoRecord.filter_by('name' == query_name).first_or_404()
+        user_profile = UserInfoRecord.query.filter_by(name = query_name).first_or_404()
+        user_profile = convert_profile_into_json_format(user_profile)
+
         return jsonify(code=10010, msg='查询成功', data={'user_profile': user_profile})
     except Exception as e:
         return jsonify(code=20010, msg='查询失败', data=str(e))
@@ -30,17 +50,7 @@ def get_public_profiles():
         user_profiles = UserInfoRecord.query.all()
         usr_list = []
         for user_profile in user_profiles:
-            department = Department.query.get(user_profile.department_id)
-            department_name = department.department_name
-
-            usr_list.append(
-                {'name': user_profile.name,
-                 'employee_id': user_profile.employee_id,
-                 'gender': user_profile.gender,
-                 'phone': user_profile.phone,
-                 'department': department_name
-                 }
-            )
+            usr_list.append(convert_profile_into_json_format(user_profile))
 
         return jsonify(code=10010, msg='查询成功', data={'user_public_profiles': usr_list})
     except Exception as e:
