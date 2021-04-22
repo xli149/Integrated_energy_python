@@ -11,3 +11,4 @@ class Config:
     SEND_FILE_MAX_AGE_DEFAULT = timedelta(seconds=1)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'test.db')
 
+

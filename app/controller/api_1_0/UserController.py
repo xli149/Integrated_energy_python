@@ -1,12 +1,22 @@
 import time
 
 from app.controller.api_1_0 import Api
-from flask import request, jsonify
+from flask import request, jsonify, session, g
 from app.model.Model import EnergyType, EnergyRecord, UserInfoRecord, Department, Role
 from utils.FakeData import fake_data
 from app import db
 
 
+@Api.before_request
+def before_request():
+    g.user = None
+    try:
+        if 'user_id' in session:
+            user_profile = UserInfoRecord.query.filter_by(id = session['user_id']).first_or_404()
+            g.user = user_profile
+
+    except Exception as e:
+            print(f"Err: {e}, user does not exist")
 
 
 def convert_profile_into_json_format(user_profile):
@@ -28,8 +38,10 @@ def convert_profile_into_json_format(user_profile):
         print(f"err: {e}")
 
 
-@Api.route('/user/profile', methods=['POST'])
+@Api.route('/user/profile', methods=['GET', 'POST'])
 def get_profile():
+    if not g.user:
+        return jsonify(code=20010, msg='查询失败，请先登录')
     try:
         query_name = request.args.get('name')
         if query_name is None:
@@ -42,10 +54,10 @@ def get_profile():
         return jsonify(code=20010, msg='查询失败', data=str(e))
 
 
-
-
 @Api.route('/user/public_profiles', methods=['GET'])
 def get_public_profiles():
+    if not g.user:
+        return jsonify(code=20010, msg='查询失败，请先登录')
     try:
         user_profiles = UserInfoRecord.query.all()
         usr_list = []
@@ -57,8 +69,34 @@ def get_public_profiles():
         return jsonify(code=20010, msg='查询失败', data=str(e))
 
 
+@Api.route('/login', methods=['GET', 'POST'])
+def login():
+    try:
+        if request.method == 'POST':
+            session.pop('user_id', None)
+            account = request.form.get('account')
+            pwd = request.form.get('pwd')
+            '''
+              如果数据库中用户名存在，查看用户名所关联密码是否等于登入密码。
+              如果条件都满足，则存储用户id到session 返回true，否则返回
+              False
+            '''
+            user_profile = UserInfoRecord.query.filter_by(account=account).first_or_404()
+            if user_profile.pwd == pwd:
+                session['user_id'] = user_profile.id
+                return jsonify(code=10010, msg='登录成功', data={'user id': user_profile.id})
+            else:
+                return jsonify(code=20010, msg="登录失败，用户名或密码错误")
+
+    except Exception as e:
+        print(f'err:{e}')
+        return jsonify(code=20010, msg="登录失败", data={'err': str(e)})
+
+
 @Api.route('/user/add', methods=['POST'])
 def add_user():
+    if not g.user:
+        return jsonify(code=20010, msg='查询失败，请先登录')
     try:
         account = request.args.get('account')
         pwd = request.args.get('pwd')
@@ -95,6 +133,8 @@ def add_user():
 @Api.route('/department/add', methods=['POST'])
 
 def add_department():
+    if not g.user:
+        return jsonify(code=20010, msg='查询失败，请先登录')
     try:
         department_name = request.args.get('department_name')
         print(f"department: {department_name}")
